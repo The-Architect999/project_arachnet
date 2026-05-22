@@ -18,10 +18,12 @@
 '''testing - make bots modular with configurations'''
 
 # --- livemint_bot.py ---
-from scraper_module import run_scraper_engine
+from SCRAPER.scraping_engine import run_scraper_engine
 from bs4 import BeautifulSoup
 
 # STEP 1: Define the target configurations
+# Note: make parsing engine module defined by config, 
+# config will be a part of individual bot files
 CONFIG = {
     "url_template": "https://www.livemint.com/economy/page-{}",
     "pages": 3,
