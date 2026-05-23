@@ -2,3 +2,5 @@ __pycache__/
 venv/
 .env
 *.log
+livemint_economy_clean.csv
+html_generator.py

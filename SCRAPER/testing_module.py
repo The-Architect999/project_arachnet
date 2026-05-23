@@ -1,57 +1,42 @@
-# from scraper_module import run_scraper_engine
-# from bs4 import BeautifulSoup
-# # link = "https://www.moneycontrol.com/news/business/economy/page-{}/"
-# link = "https://www.livemint.com/market-{}"
-# payloads = run_scraper_engine(link, 3)
-
-# # Loop through the list to unpack each page package
-# for item in payloads:
-#     page_number = item['page_num']
-#     raw_html_string = item['html'] # Extract the actual string text
-    
-#     print(f"Parsing Page {page_number} content with BeautifulSoup...")
-#     soup = BeautifulSoup(raw_html_string, "html.parser")
-#     print(soup.text)
-
-
-
 '''testing - make bots modular with configurations'''
+import pandas as pd
+from parsing_engine import ez_parse
 
-# --- livemint_bot.py ---
-from SCRAPER.scraping_engine import run_scraper_engine
-from bs4 import BeautifulSoup
+# =====================================================================
+# SITE CONFIGURATIONS (This is the only part you change for new sites)
+# =====================================================================
 
-# STEP 1: Define the target configurations
-# Note: make parsing engine module defined by config, 
-# config will be a part of individual bot files
-CONFIG = {
+# Layout Template A: JSON Schema Mining (Livemint Style)
+livemint = {
     "url_template": "https://www.livemint.com/economy/page-{}",
-    "pages": 3,
-    "container_tag": "div",
-    "container_class": "headline-sec",
-    "headline_tag": "h2"
+    "pages": 1,
+    "strategy": "json_script",
+    "script_type": "application/ld+json",
+    "schema_type": "ItemList",
+    "array_key": "itemListElement",
+    "mapping": {"headline": "name", "link": "url", "summary": "description"}
 }
 
-# STEP 2: Run your universal engine to gather the raw payloads
-payloads = run_scraper_engine(CONFIG["url_template"], expected_pages=CONFIG["pages"])
+# Layout Template B: Standard Visual HTML DOM Drilling (Moneycontrol Style)
+moneycontrol = {
+    "url_template": "https://www.moneycontrol.com/news/business/economy/page-{}",
+    "pages": 1,
+    "strategy": "html_dom",
+    "container_tag": "li",
+    "container_class": "clearfix",
+    "headline_tag": "h2",
+    "anchor_position": "child", # "child" if <a> is inside headline, "parent" if <a> wraps around it
+    "summary_tag": "p",
+    "date_class": "date"
+}
 
-# STEP 3: Execute your parsing rules cleanly
-all_extracted_data = []
+# Pick your active target site config here:
+active_config = livemint
 
-for item in payloads:
-    soup = BeautifulSoup(item['html'], "html.parser")
-    
-    # Isolate the main layout segments using your unique configuration parameters
-    target_blocks = soup.find_all(CONFIG["container_tag"], class_=CONFIG["container_class"])
-    
-    for block in target_blocks:
-        headline_element = block.find(CONFIG["headline_tag"])
-        if headline_element:
-            all_extracted_data.append(headline_element.get_text(strip=True))
+final_records = ez_parse(active_config)
 
-print(f"Extracted {len(all_extracted_data)} unique records using site-specific blueprint rules.")
-
-
-
-
-
+# 4. Save Final Output
+if final_records:
+    df = pd.DataFrame(final_records)
+    df.drop_duplicates(subset=["headline"], inplace=True)
+    df.to_csv("livemint_economy_clean.csv", index=False) #todo: make modular based on site name
