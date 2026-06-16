@@ -3,4 +3,4 @@ venv/
 .env
 *.log
 livemint_economy_clean.csv
-html_generator.py
+moneycontrol_clean.csv

@@ -136,7 +136,7 @@ def run_scraper_engine(target_url_template, expected_pages, force_dynamic=False,
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--disable-blink-features=AutomationControlled")
             
-            driver = uc.Chrome(options=chrome_options, version_main=122)
+            driver = uc.Chrome(options=chrome_options)
                 
             for page in range(1, expected_pages + 1):
                 #CHECK: Skip pages already pulled successfully by prior engines
