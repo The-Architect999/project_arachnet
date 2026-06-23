@@ -4,7 +4,8 @@ from sklearn.metrics.pairwise import cosine_similarity # metric for semantic sim
 from rapidfuzz import distance # C++ optimized string matching
 from datetime import datetime, timedelta
 import json
-
+import sqlite3
+import re
 
 def compute_jaccard(str1, str2):
     """Computes word-level token overlap using optimized native sets."""
@@ -13,6 +14,30 @@ def compute_jaccard(str1, str2):
     intersection = words1.intersection(words2) 
     union = words1.union(words2) 
     return len(intersection) / len(union) if union else 0.0 # common unique words / total unique words
+
+
+'''
+FUTURE UPGRADE - TO DO
+'''
+# def clean_headline_noise(text):
+#     if not text: return ""
+#     '''
+#     Strip common editorial prefixes/suffixes to help cosine based assorting
+#     '''
+#     noise_patterns = [
+#         r"^Moneycontrol Pro Panorama\s*\|\s*",
+#         r"^Chart of the Day\s*\|\s*",
+#         r"^Data Story:\s*",
+#         r"\s*-\s*Times of India$",
+#         r"\s*:\s*Report$"
+#     ]
+#     for pattern in noise_patterns:
+#         text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+#     return text.strip()
+'''
+NOISE FILTER - headlines such as branding Moneycontrol, TOI, etc affect cosine filtering logic and makes it
+group titles with the same prefix and suffix
+'''
 
 
 def process_and_cluster_all_pairs(articles, max_hours_gap=72):
@@ -72,10 +97,14 @@ def process_and_cluster_all_pairs(articles, max_hours_gap=72):
             # Filter with Levenshtein before appending (Using TITLES for precision verification)
             inline_lev = distance.Levenshtein.normalized_similarity(best_cluster_master_text.lower(), current_title.lower())
             
-            if inline_lev > 0.35: # Structural tolerance threshold adjusted for title rephrasings
+
+            ''''dropped levenstien filter for better clusters'''
+            if inline_lev > 0.0: # Structural tolerance threshold adjusted for title rephrasings
                 best_cluster_match.append(idx)
                 placed = True
-                
+            '''marker'''
+
+
         if not placed:
             # New cluster (triggered if Cosine failed OR if Levenshtein gate rejected it)
             clusters.append([idx])
@@ -128,6 +157,124 @@ def process_and_cluster_all_pairs(articles, max_hours_gap=72):
     return final_output
 
 
+def save_clusters_to_db(analysis_report, db_name="arachnet.db"):
+    """
+    Alters articles schema, creates a clusters evaluation table, calculates metrics
+    averages from python objects, and executes transactional updates.
+    """
+    if not analysis_report:
+        print("[DB Sync] Storage skipped. Analysis report context payload is empty.")
+        return
+
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+
+    try:
+        # 1. Safely inject cluster_id column into the existing articles table if missing
+        try:
+            cursor.execute("ALTER TABLE articles ADD COLUMN cluster_id INTEGER;")
+            print("[DB Schema Update] Added missing 'cluster_id' column to 'articles' table.")
+        except sqlite3.OperationalError:
+            # Column already exists in schema, bypass alteration exception smoothly
+            pass
+
+        # 2. Build the structured master tracking clusters data table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS clusters (
+                cluster_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                main_title TEXT NOT NULL,
+                title_id INTEGER,
+                avg_levenshtein REAL,
+                avg_jaccard REAL,
+                volume REAL,
+                score REAL,
+                last_updated TIMESTAMP,
+                FOREIGN KEY (title_id) REFERENCES articles(title_id)
+            );
+        """)
+
+        for cluster_payload in analysis_report:
+            # Isolate metric variants arrays from payload processing container
+            variants = cluster_payload["metrics_payload"]
+            
+            # Calculate actual mathematical averages across all text variants inside the cluster
+            avg_lev = sum(item["raw_metrics"]["levenshtein_similarity"] for item in variants) / len(variants)
+            avg_jac = sum(item["raw_metrics"]["jaccard_similarity"] for item in variants) / len(variants)
+            
+            # 3. Insert analytics cluster payload row into database parameters
+            cursor.execute("""
+                INSERT INTO clusters (main_title, title_id, avg_levenshtein, avg_jaccard, volume, last_updated)
+                VALUES (?, ?, ?, ?, ?, ?);
+            """, (
+                cluster_payload["cluster_master"],
+                cluster_payload["cluster_anchor_db_id"],
+                round(avg_lev, 2),
+                round(avg_jac, 2),
+                float(cluster_payload["volume_count"]), # Storing current article volumes as cluster priority weight score
+                cluster_payload["latest_update_time"]
+            ))
+            
+            # Extract the unique generated primary key index ID for this active cluster record
+            generated_cluster_id = cursor.lastrowid
+
+            # 4. Map relational keys across database rows by updating original entries inside articles table
+            for variant in variants:
+                cursor.execute("""
+                    UPDATE articles 
+                    SET cluster_id = ? 
+                    WHERE title_id = ?;
+                """, (generated_cluster_id, variant["db_serial_number"]))
+
+        conn.commit()
+        print(f"[DB Sync Success] Successfully materialized clusters data metrics and mapped table relations.")
+
+    except sqlite3.Error as e:
+        print(f"[DB Error Fail] Failed to synchronize operational table variables: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
+
+#might move this to the master file
+def load_articles_from_db(db_name="arachnet.db", test_all=True):
+    """
+    Queries the live articles table and structures the rows into the 
+    exact dictionary format required by the clustering engine.
+    """
+    conn = sqlite3.connect(db_name)
+    conn.row_factory = sqlite3.Row  # Access columns by name natively
+    cursor = conn.cursor()
+    
+    try:
+        if test_all:
+            # Pull everything in the table for a comprehensive initial run
+            cursor.execute("SELECT title_id, title, summary, date_captured FROM articles;")
+        else:
+            # Production style: Only process rows that haven't been assigned a cluster yet
+            cursor.execute("SELECT title_id, title, summary, date_captured FROM articles WHERE cluster_id IS NULL;")
+            
+        rows = cursor.fetchall()
+        print(f"[DB Load] Successfully extracted {len(rows)} records from the 'articles' table.")
+        
+    except sqlite3.OperationalError as e:
+        print(f"[DB Load Error] Could not read table. Ensure your scraper has run at least once: {e}")
+        return []
+    finally:
+        conn.close()
+
+    # Map database column names to the exact dictionary keys the algorithm expects
+    real_db_records = []
+    for row in rows:
+        real_db_records.append({
+            "db_id": row["title_id"],          # Maps primary key to engine pointer
+            "title": row["title"],
+            "summary": row["summary"] if row["summary"] else "", # Fallback guard for empty summaries
+            "published_at": row["date_captured"]
+        })
+        
+    return real_db_records
+
+
+
 # ==========================================
 # SIMULATED DB WITHDRAWAL TESTING
 # ==========================================
@@ -160,5 +307,8 @@ if __name__ == "__main__":
         }
     ]
     
-    analysis_report = process_and_cluster_all_pairs(mock_db_records)
+    analysis_report = process_and_cluster_all_pairs(load_articles_from_db())
     print(json.dumps(analysis_report, indent=4))
+
+    # Run the database synchronization routine layout
+    save_clusters_to_db(analysis_report)
