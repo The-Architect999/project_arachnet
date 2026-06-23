@@ -4,3 +4,4 @@ venv/
 *.log
 livemint_economy_clean.csv
 moneycontrol_clean.csv
+*.db
