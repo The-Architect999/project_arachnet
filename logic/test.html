@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arachnet // Intelligence Terminal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #2e1065; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4c1d95; }
+    </style>
+</head>
+<body class="bg-black text-zinc-200 font-sans antialiased selection:bg-violet-500/30 selection:text-violet-300">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-zinc-950 border-r border-zinc-900 flex flex-col justify-between hidden md:flex">
+            <div>
+                <div class="h-16 flex items-center px-6 border-b border-zinc-900">
+                    <div class="flex items-center gap-3">
+                        <div class="h-8 w-8 bg-gradient-to-br from-violet-700 to-black rounded-lg flex items-center justify-center border border-violet-500/20">
+                            <i class="fa-solid fa-spider text-violet-400 text-xs"></i>
+                        </div>
+                        <span class="font-mono text-xs tracking-widest font-bold bg-gradient-to-r from-zinc-100 to-violet-400 bg-clip-text text-transparent">ARACHNET</span>
+                    </div>
+                </div>
+                
+                <nav class="p-4 space-y-1">
+                    <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-violet-950/20 text-violet-400 border border-violet-900/30 text-xs font-medium">
+                        <i class="fa-solid fa-square-poll-vertical text-xs"></i> Terminal Dashboard
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-zinc-500 hover:text-zinc-200 text-xs font-medium transition-all">
+                        <i class="fa-solid fa-bolt-lightning text-xs"></i> Logic Pipelines
+                    </a>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-zinc-900">
+                <div class="bg-zinc-900/30 rounded-lg p-3 border border-zinc-900 flex items-center gap-3">
+                    <div class="h-2 w-2 rounded-full bg-violet-500 animate-pulse"></div>
+                    <span class="font-mono text-[10px] text-zinc-500">ENGINE STATE: NOMINAL</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden">
+            
+            <header class="h-16 border-b border-zinc-900 flex items-center justify-between px-8 bg-zinc-950/20">
+                <div class="text-xs font-mono text-zinc-500">
+                    NODE: <span class="text-violet-400">production_vps.arachnet.in</span>
+                </div>
+                <div class="text-xs font-mono text-zinc-500">
+                    SYSTEM STAMP: <span class="text-zinc-400">2026-06-22</span>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <section class="bg-gradient-to-r from-zinc-950 to-black border border-violet-950/40 rounded-xl p-4 flex items-start gap-4">
+                    <div class="relative flex-shrink-0">
+                        <div class="h-14 w-14 bg-zinc-900 rounded-lg border border-violet-500/30 flex items-center justify-center overflow-hidden">
+                            <i class="fa-solid fa-user-shield text-violet-400 text-lg"></i>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 h-3 w-3 bg-violet-500 border-2 border-black rounded-full"></div>
+                    </div>
+                    
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-mono font-bold tracking-wide text-violet-400 uppercase">System Assistant // Shalltear</h4>
+                            <span class="text-[9px] font-mono text-zinc-600">ID: Guard-02</span>
+                        </div>
+                        <p class="text-xs text-zinc-400 leading-relaxed max-w-4xl">
+                            "Welcome back, Master. The core web-scraping clusters are running optimally. All incoming news nodes are being converted, timestamped, and stored according to your specifications. Let me know which pipeline data vector you wish to analyze next."
+                        </p>
+                    </div>
+                </section>
+
+                <section class="space-y-2">
+                    <h3 class="text-[10px] font-mono tracking-wider text-zinc-500 uppercase">Macro Market Reference Matrix</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                        
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-500">Nifty 50</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">23,520</span>
+                                <span class="text-[10px] font-mono text-violet-400/80">-0.24%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-500">Crude Oil</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">$81.40</span>
+                                <span class="text-[10px] font-mono text-violet-400/80">+0.62%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-500">Gold (10g)</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">₹72,450</span>
+                                <span class="text-[10px] font-mono text-zinc-400">0.00%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-500">INR / USD</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">83.62</span>
+                                <span class="text-[10px] font-mono text-violet-400/80">+0.08%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-400">MF Large Cap</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">164.2</span>
+                                <span class="text-[10px] font-mono text-violet-400/80">-0.12%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-400">MF Mid Cap</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">312.8</span>
+                                <span class="text-[10px] font-mono text-violet-400/80">-0.45%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 hover:border-violet-950/60 transition-all">
+                            <p class="text-[10px] font-mono text-zinc-400">MF Small Cap</p>
+                            <div class="flex items-baseline justify-between mt-1">
+                                <span class="text-sm font-semibold tracking-tight">524.1</span>
+                                <span class="text-[10px] font-mono text-violet-400/80">-0.88%</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="space-y-3">
+                    <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+                        <h2 class="text-xs font-mono tracking-wider uppercase font-semibold text-zinc-400">Ranked Trend Ingestion Stack</h2>
+                        <span class="text-[9px] text-zinc-500 font-mono">Sorted by Algorithm Score</span>
+                    </div>
+
+                    <div class="bg-zinc-950 border border-zinc-900 rounded-xl p-5 hover:border-violet-950/40 transition-colors space-y-3">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-mono font-bold text-violet-500">RANK 01</span>
+                                    <span class="text-zinc-700 font-mono text-xs">•</span>
+                                    <h4 class="text-xs font-semibold text-zinc-200">Markets tank 500 points on global geopolitical tensions</h4>
+                                </div>
+                                <p class="text-xs text-zinc-500 max-w-4xl pl-14">
+                                    Domestic equity indices crashed sharply today as stock benchmarks dropped over 500 points. Severe financial devastation feared as oil supply corridors face military blockades.
+                                </p>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 font-mono text-[11px] self-end lg:self-auto pl-14 lg:pl-0">
+                                <div class="text-right">
+                                    <span class="text-[10px] text-zinc-600 uppercase block">SURGE ENERGY</span>
+                                    <span class="font-semibold text-red-400">-0.4500</span>
+                                </div>
+                                <div class="w-px h-6 bg-zinc-900"></div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-zinc-600 uppercase block">RELEVANCE WEIGHT</span>
+                                    <span class="font-semibold text-violet-400">NIFTY / OIL</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-x-6 gap-y-2 pl-14 pt-2 border-t border-zinc-900/40 text-[10px] font-mono text-zinc-500">
+                            <div><span class="text-zinc-600">Density Volume:</span> <span class="text-zinc-400">2 Nodes</span></div>
+                            <div><span class="text-zinc-600">Jaccard Cohesion:</span> <span class="text-violet-400">0.6900</span></div>
+                            <div><span class="text-zinc-600">VADER Profile:</span> <span class="text-red-400/70">Negative Matrix</span></div>
+                            <div class="ml-auto text-zinc-600"><i class="fa-regular fa-clock text-[9px] mr-1"></i>Ingested: 2026-06-22 10:00:00</div>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
